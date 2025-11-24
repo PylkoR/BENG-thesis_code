@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sys
 
-file_path = 'raw_data/mwig40_d.csv'
+file_path = '../raw_data/mwig40_d.csv'
 
 try:
     df = pd.read_csv(file_path, parse_dates=['Data'])
