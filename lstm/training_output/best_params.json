@@ -4,15 +4,19 @@
         -1,
         1
     ],
-    "num_layers": 1,
+    "num_layers": 2,
     "dense_units": 16,
     "learning_rate": 0.001,
     "batch_size": 32,
     "seq_len": 60,
     "layers": [
         {
-            "units": 32,
+            "units": 96,
             "dropout": 0.5
+        },
+        {
+            "units": 32,
+            "dropout": 0.1
         }
     ]
 }

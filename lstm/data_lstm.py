@@ -8,7 +8,7 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 DATA_PATH = os.path.join(PROJECT_ROOT, 'dataset.csv')
 
 # Ścieżka wyjściowa
-OUTPUT_DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_processed.csv')
+OUTPUT_DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_lstm.csv')
 
 # Funkcje pomocnicze do wskaźników
 def calculate_rsi(series, window=14):

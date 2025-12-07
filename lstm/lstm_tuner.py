@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 # Ścieżki
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_processed.csv')
+DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_lstm.csv')
 
 # Katalogi wyjściowe
 TUNER_DIR = os.path.join(SCRIPT_DIR, 'tuning_cache')

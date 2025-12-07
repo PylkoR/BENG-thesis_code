@@ -12,7 +12,7 @@ from tensorflow.keras.callbacks import EarlyStopping, CSVLogger
 
 # Konfiguracja ścieżek
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_processed.csv')
+DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_lstm.csv')
 
 # Katalogi wyjściowe
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, 'training_output')

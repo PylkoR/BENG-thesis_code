@@ -9,7 +9,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 # Ścieżki
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_processed.csv')
+DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_lstm.csv')
 
 # Katalogi z artefaktami (model, params, skalery)
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, 'training_output')
