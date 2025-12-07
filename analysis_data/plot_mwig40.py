@@ -6,7 +6,7 @@ import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 DATA_PATH = os.path.join(PROJECT_ROOT, 'raw_data/mwig40_d.csv')
-OUTPUT_FILE = os.path.join(PROJECT_ROOT, 'plots/mwig40_alltime.png')
+OUTPUT_FILE = os.path.join(SCRIPT_DIR, 'plots/mwig40_alltime.png')
 
 TITLE_FONT_SIZE = 18
 AXIS_FONT_SIZE = 14
