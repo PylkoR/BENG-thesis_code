@@ -20,6 +20,9 @@ TITLE_FONT_SIZE = 18
 AXIS_FONT_SIZE = 14
 TICK_FONT_SIZE = 12
 
+# Data poodziału na treningowy i testowy
+SPLIT_DATE = '2022-01-03'
+
 try:
     # 1. Wczytanie i przygotowanie danych
     print(f"Wczytywanie danych z: {DATA_PATH}")
@@ -29,7 +32,7 @@ try:
 
     target_col = 'mwig40_Zamkniecie'
     
-    # 2. Implementacja Metody Naiwnej
+    # 2. Cena przesunięta o jeden dzień jako prognoza
     df['Naive_Forecast'] = df[target_col].shift(1)
     
     # Usuwamy pierwszy wiersz (NaN po przesunięciu)
@@ -37,9 +40,12 @@ try:
 
     data = df[[target_col, 'Naive_Forecast']].copy()
 
-    # 3. Podział na zbiór treningowy i testowy (90/10)
-    train_size = int(len(data) * 0.9)
-    train, test = data.iloc[:train_size], data.iloc[train_size:].copy()
+    # 3. Podział na zbiór treningowy i testowy od daty SPLIT_DATE
+    mask_train = data.index < SPLIT_DATE
+    mask_test = data.index >= SPLIT_DATE
+
+    train = data.loc[mask_train]
+    test = data.loc[mask_test]
 
     print(f"Zbiór treningowy: {len(train)} obserwacji")
     print(f"Zbiór testowy: {len(test)} obserwacji")
@@ -52,7 +58,7 @@ try:
     print(f"\nWyniki metody naiwnej:")
     print(f"MAE: {mae:.2f}")
     print(f"RMSE: {rmse:.2f}")
-    print(f"MAPE: {mape:.2f}%")
+    print(f"MAPE: {mape:.4f}%")
 
     # Zapis metryk do pliku CSV
     metrics_df = pd.DataFrame({
@@ -67,7 +73,7 @@ try:
     # Wykres 1: Szerszy kontekst (ostatnie 200 dni treningu + test)
     plt.figure(figsize=(12, 6))
     plt.plot(train.index[-200:], train[target_col].iloc[-200:], label='Dane Treningowe')
-    plt.plot(test.index, test[target_col], label='Dane Rzeczywiste')
+    plt.plot(test.index, test[target_col], label='Dane Rzeczywiste', color='green')
     plt.plot(test.index, test['Naive_Forecast'], label='Prognoza Naiwna', color='red', linestyle='--', alpha=0.8)
     
     plt.title('Prognoza Naiwna vs Rzeczywistość', fontsize=TITLE_FONT_SIZE)
@@ -81,12 +87,14 @@ try:
     print(f"Zapisano wykres ogólny do: {OUTPUT_PLOT_FULL}")
 
     # Wykres 2: Zoom na ostatnie 100 dni prognozy
-    plt.figure(figsize=(12, 6))
-    last_100_days = test.index[-100:]
-    plt.plot(last_100_days, test[target_col].tail(100), label='Dane Rzeczywiste', linewidth=2)
-    plt.plot(last_100_days, test['Naive_Forecast'].tail(100), label='Prognoza Naiwna', color='red', linestyle='--', linewidth=2)
+    start_date = '2025-01-02'
+    plot_data = test.loc[start_date:]
 
-    plt.title('Szczegóły prognozy (ostatnie 100 dni)', fontsize=TITLE_FONT_SIZE)
+    plt.figure(figsize=(12, 6))
+    plt.plot(plot_data.index, plot_data[target_col], label='Dane Rzeczywiste', linewidth=2, color='green')
+    plt.plot(plot_data.index, plot_data['Naive_Forecast'], label='Prognoza Naiwna', color='red', linestyle='--', linewidth=2)
+
+    plt.title('Szczegóły prognozy od 2025 roku', fontsize=TITLE_FONT_SIZE)
     plt.xlabel('Data', fontsize=AXIS_FONT_SIZE)
     plt.ylabel('Kurs mWIG40', fontsize=AXIS_FONT_SIZE)
     plt.xticks(fontsize = TICK_FONT_SIZE)

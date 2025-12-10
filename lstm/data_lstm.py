@@ -37,7 +37,7 @@ try:
     # 2. Inżynieria Cech
     print("Obliczanie wskaźników...")
     
-    # Logarytmiczne zwroty dla rynków zewnętrznych (synchronizacja dynamiki)
+    # Logarytmiczne zwroty dla rynków zewnętrznych
     external_assets = {
         'dax_Zamkniecie': 'DAX_Ret',
         'spx_Zamkniecie': 'SPX_Ret',
@@ -76,11 +76,12 @@ try:
 
     # 3. Selekcja i czyszczenie
     features_to_keep = [
-        'mwig40_Zamkniecie',    # Cel predykcji
+        'mwig40_Zamkniecie',
         'mwig40_Wolumen',       
         'mWIG40_Ret',           
         'RSI_14', 'Bollinger_PB', 'MACD_Hist', 'Volatility_20', 
-        'DAX_Ret', 'SPX_Ret', 'NKX_Ret', 'Brent_Ret', 'EURPLN_Ret', 'USDPLN_Ret', 'WIG20_Ret',
+        'DAX_Ret', 'SPX_Ret', 'spx_Wolumen', 'NKX_Ret', 'Brent_Ret', 'EURPLN_Ret', 'USDPLN_Ret', 'WIG20_Ret',
+        'pmi_PMI',
         'vix_Zamkniecie'        
     ]
 
@@ -88,14 +89,16 @@ try:
     available_features = [f for f in features_to_keep if f in df.columns]
     df_processed = df[available_features].copy()
 
-    # Usuwam NaN powstałe przy liczeniu wskaźników (pierwsze ~20-50 wierszy)
+    # Usuwanie NaN powstałe przy liczeniu wskaźników
     initial_len = len(df_processed)
     df_processed = df_processed.dropna()
     print(f"Usunięto {initial_len - len(df_processed)} wierszy (rozruch wskaźników)")
 
     # 4. Zapis
     df_processed.to_csv(OUTPUT_DATA_PATH, sep=';', decimal=',')
+    df_processed.to_csv(PROJECT_ROOT + '\\dataset_lstm.csv', sep=';', decimal=',')
     print(f"Zapisano przetworzone dane do: {OUTPUT_DATA_PATH}")
+    print(f"Zapisano przetworzone dane do: {PROJECT_ROOT + '\\dataset_lstm.csv'}")
 
 except Exception as e:
     print(f"Wystąpił błąd krytyczny: {e}")

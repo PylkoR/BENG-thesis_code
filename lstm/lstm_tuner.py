@@ -24,7 +24,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # Parametry - zmiana
 TARGET_COL = 'mWIG40_Ret'
 SEQ_LEN = 60         
-TEST_SPLIT = 0.1    
+SPLIT_DATE = '2022-01-03'
 VAL_SPLIT = 0.2     
 BATCH_SIZE = 32     
 

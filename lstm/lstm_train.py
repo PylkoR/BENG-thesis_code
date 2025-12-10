@@ -26,7 +26,7 @@ LOSS_PLOT_PATH = os.path.join(OUTPUT_DIR, 'lstm_training_loss.png')
 LOG_CSV_PATH = os.path.join(OUTPUT_DIR, 'training_log.csv')
 
 # Stałe
-TEST_SPLIT = 0.1 
+TEST_SPLIT = 0.1
 
 def create_sequences(X_data, y_data, seq_len):
     X, y = [], []
