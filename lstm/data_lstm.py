@@ -8,7 +8,8 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 DATA_PATH = os.path.join(PROJECT_ROOT, 'dataset.csv')
 
 # Ścieżka wyjściowa
-OUTPUT_DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_lstm.csv')
+OUTPUT_DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_ret.csv')
+OUTPUT_DATA_PATH_ROOT = os.path.join(PROJECT_ROOT, 'dataset_ret.csv')
 
 # Funkcje pomocnicze do wskaźników
 def calculate_rsi(series, window=14):
@@ -96,9 +97,9 @@ try:
 
     # 4. Zapis
     df_processed.to_csv(OUTPUT_DATA_PATH, sep=';', decimal=',')
-    df_processed.to_csv(PROJECT_ROOT + '\\dataset_lstm.csv', sep=';', decimal=',')
+    df_processed.to_csv(OUTPUT_DATA_PATH_ROOT, sep=';', decimal=',')
     print(f"Zapisano przetworzone dane do: {OUTPUT_DATA_PATH}")
-    print(f"Zapisano przetworzone dane do: {PROJECT_ROOT + '\\dataset_lstm.csv'}")
+    print(f"Zapisano przetworzone dane do: {OUTPUT_DATA_PATH_ROOT}")
 
 except Exception as e:
     print(f"Wystąpił błąd krytyczny: {e}")

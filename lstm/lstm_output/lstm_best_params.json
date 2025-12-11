@@ -1,64 +1,22 @@
 {
     "meta": {
-        "target_col": "mWIG40_Ret",
-        "split_date": "2022-01-03",
-        "features": [
-            "mwig40_Zamkniecie",
-            "mwig40_Wolumen",
-            "RSI_14",
-            "Bollinger_PB",
-            "MACD_Hist",
-            "Volatility_20",
-            "DAX_Ret",
-            "SPX_Ret",
-            "spx_Wolumen",
-            "NKX_Ret",
-            "Brent_Ret",
-            "EURPLN_Ret",
-            "USDPLN_Ret",
-            "WIG20_Ret",
-            "pmi_PMI",
-            "vix_Zamkniecie"
-        ]
+        "target": "mWIG40_Ret",
+        "split": "2022-01-03"
     },
-    "optimal_structure": {
-        "seq_len": 40,
-        "batch_size": 16,
-        "num_lstm_layers": 2,
-        "dense_units": 0,
+    "structure": {
+        "seq_len": 60,
+        "batch_size": 32,
+        "learning_rate": 0.0016289544835511227,
         "optimizer": "rmsprop",
-        "learning_rate": 0.0005074581824066543
-    },
-    "all_params": {
-        "seq_len": 40,
-        "n_features": 16,
-        "num_lstm_layers": 2,
-        "lstm_units_0": 64,
-        "dropout_0": 0.1,
-        "use_dense_layer": false,
-        "optimizer": "rmsprop",
-        "learning_rate": 0.0005074581824066543,
-        "batch_size": 16,
-        "dense_units": 80,
-        "dense_activation": "tanh",
-        "lstm_units_1": 224,
-        "dropout_1": 0.1,
-        "lstm_units_2": 64,
-        "dropout_2": 0.0,
-        "tuner/epochs": 30,
-        "tuner/initial_epoch": 10,
-        "tuner/bracket": 3,
-        "tuner/round": 3,
-        "tuner/trial_id": "0047"
+        "use_dense": true,
+        "dense_units": 16,
+        "dense_activation": "relu"
     },
     "layers_config": [
         {
-            "units": 64,
-            "dropout": 0.1
-        },
-        {
-            "units": 224,
-            "dropout": 0.1
+            "units": 96,
+            "dropout": 0.4,
+            "return_sequences": false
         }
     ]
 }

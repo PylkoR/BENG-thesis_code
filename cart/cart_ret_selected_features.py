@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 # Definicja ścieżek systemowych
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.dirname(SCRIPT_DIR))
-DATA_PATH = os.path.join(PROJECT_ROOT, 'dataset_lstm_lag.csv')
+DATA_PATH = os.path.join(PROJECT_ROOT, 'dataset_ret_lag.csv')
 
 # Konfiguracja katalogów wyjściowych
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, 'cart_ret_output_selected_features')
