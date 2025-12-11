@@ -1,33 +1,29 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 import json
 import joblib
-from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import EarlyStopping, CSVLogger
+from tensorflow.keras.optimizers import Adam, RMSprop, SGD
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
-# Konfiguracja ścieżek
+# --- KONFIGURACJA ŚCIEŻEK ---
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+LSTM_ROOT = os.path.join(SCRIPT_DIR, 'lstm_output')
 DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_lstm.csv')
 
-# Katalogi wyjściowe
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, 'training_output')
-PARAMS_PATH = os.path.join(OUTPUT_DIR, 'best_params.json')
+# Wejście (z Tunera)
+PARAMS_PATH = os.path.join(LSTM_ROOT, 'lstm_best_params.json')
+SCALER_X_PATH = os.path.join(LSTM_ROOT, 'scaler_x.pkl')
+SCALER_Y_PATH = os.path.join(LSTM_ROOT, 'scaler_y.pkl')
 
-# Artefakty (model i skalery)
-MODEL_PATH = os.path.join(OUTPUT_DIR, 'lstm_model.keras')
-SCALER_FEAT_PATH = os.path.join(OUTPUT_DIR, 'scaler_features.pkl')
-SCALER_TARG_PATH = os.path.join(OUTPUT_DIR, 'scaler_target.pkl')
-LOSS_PLOT_PATH = os.path.join(OUTPUT_DIR, 'lstm_training_loss.png')
-LOG_CSV_PATH = os.path.join(OUTPUT_DIR, 'training_log.csv')
+# Wyjście (Trening)
+TRAIN_DIR = os.path.join(LSTM_ROOT, 'training_results')
+os.makedirs(TRAIN_DIR, exist_ok=True)
+MODEL_SAVE_PATH = os.path.join(TRAIN_DIR, 'best_lstm_model.keras')
 
-# Stałe
-TEST_SPLIT = 0.1
-
+# --- FUNKCJE ---
 def create_sequences(X_data, y_data, seq_len):
     X, y = [], []
     for i in range(len(X_data) - seq_len):
@@ -35,128 +31,95 @@ def create_sequences(X_data, y_data, seq_len):
         y.append(y_data[i + seq_len])
     return np.array(X), np.array(y)
 
-try:
-    # 1. Wczytanie konfiguracji z Tunera
-    if not os.path.exists(PARAMS_PATH):
-        raise FileNotFoundError(f"Brak pliku {PARAMS_PATH}. Najpierw uruchom lstm_tune.py!")
-        
-    print(f"Wczytywanie parametrów z: {PARAMS_PATH}")
-    with open(PARAMS_PATH, 'r') as f:
-        best_params = json.load(f)
+def build_model_from_config(config, n_features):
+    struct = config['optimal_structure']
+    layers_cfg = config['layers_config']
     
-    # Pobieramy kluczowe ustawienia
-    SEQ_LEN = best_params['seq_len']
-    BATCH_SIZE = best_params['batch_size']
-    LEARNING_RATE = best_params['learning_rate']
-    TARGET_COL = best_params.get('target_col', 'mwig40_Zamkniecie')
-    SCALER_RANGE = tuple(best_params.get('scaler_range', [0, 1]))
-    
-    print(f"Cel predykcji: {TARGET_COL}")
-    print(f"Zakres skalera: {SCALER_RANGE}")
-    print(f"Architektura: SEQ_LEN={SEQ_LEN}, BATCH={BATCH_SIZE}, LR={LEARNING_RATE}")
-
-    # 2. Wczytanie danych
-    print(f"Wczytywanie danych z: {DATA_PATH}")
-    df = pd.read_csv(DATA_PATH, sep=';', decimal=',', index_col=0)
-    df.index = pd.to_datetime(df.index)
-    df = df.sort_index()
-
-    # Usuwamy NaN (ważne przy zwrotach)
-    df = df.dropna()
-    feature_cols = df.columns.tolist()
-
-    # 3. Podział danych
-    train_size = int(len(df) * (1 - TEST_SPLIT))
-    train_df = df.iloc[:train_size]
-    # test_df = df.iloc[train_size:]
-
-    print(f"Liczba wierszy treningowych: {len(train_df)}")
-
-    # 4. Skalowanie
-    print("Skalowanie danych...")
-    scaler_features = MinMaxScaler(feature_range=SCALER_RANGE)
-    scaler_target = MinMaxScaler(feature_range=SCALER_RANGE)
-
-    # Fitting na danych treningowych
-    scaled_train_features = scaler_features.fit_transform(train_df[feature_cols])
-    scaled_train_target = scaler_target.fit_transform(train_df[[TARGET_COL]])
-
-    # Skalery
-    joblib.dump(scaler_features, SCALER_FEAT_PATH)
-    joblib.dump(scaler_target, SCALER_TARG_PATH)
-    print("Zapisano skalery.")
-
-    # 5. Przygotowanie sekwencji
-    X_train, y_train = create_sequences(scaled_train_features, scaled_train_target, SEQ_LEN)
-    print(f"Wymiary danych wejściowych X: {X_train.shape}")
-
-    # 6. Budowa modelu (dynamicznie z JSON)
-    print("Budowa modelu...")
     model = Sequential()
+    model.add(Input(shape=(struct['seq_len'], n_features)))
     
-    # Wejście
-    model.add(Input(shape=(SEQ_LEN, len(feature_cols))))
-    
-    # Warstwy ukryte
-    layers_config = best_params['layers']
-    num_layers = len(layers_config)
-    
-    for i, layer_conf in enumerate(layers_config):
-        units = layer_conf['units']
-        dropout_rate = layer_conf['dropout']
-        
-        # Ostatni LSTM zawsze return_sequences=False
-        is_last_lstm = (i == num_layers - 1)
-        return_seq = not is_last_lstm
+    # Warstwy LSTM
+    num_layers = struct['num_lstm_layers']
+    for i in range(num_layers):
+        units = layers_cfg[i]['units']
+        dropout = layers_cfg[i]['dropout']
+        return_seq = True if i < num_layers - 1 else False
         
         model.add(LSTM(units=units, return_sequences=return_seq))
-        model.add(Dropout(dropout_rate))
-        print(f" -> Warstwa LSTM: {units} neuronów, Dropout: {dropout_rate}")
-
-    # Warstwy gęste (Dense)
-    dense_units = best_params['dense_units']
-    model.add(Dense(dense_units, activation='relu'))
-    model.add(Dense(1)) # Wyjście
+        if dropout > 0:
+            model.add(Dropout(dropout))
+            
+    # Dense
+    if struct.get('dense_units', 0) > 0:
+        model.add(Dense(struct['dense_units'], activation='relu'))
+        
+    model.add(Dense(1))
     
-    model.compile(optimizer=Adam(learning_rate=LEARNING_RATE), loss='mean_squared_error')
-
-    # 7. Trening
-    print("\nRozpoczynam trening...")
+    # Kompilacja
+    lr = struct['learning_rate']
+    opt_name = struct['optimizer']
     
-    # Early Stopping
-    early_stop = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True, verbose=1)
-    csv_logger = CSVLogger(LOG_CSV_PATH)
-
-    history = model.fit(
-        X_train, y_train,
-        batch_size=BATCH_SIZE,
-        epochs=150,
-        validation_split=0.2,
-        callbacks=[early_stop, csv_logger],
-        verbose=1
-    )
-
-    # 8. Zapis modelu i wykresu
-    model.save(MODEL_PATH)
-    print(f"\nModel zapisano w: {MODEL_PATH}")
-
-    # Wykres Loss
-    plt.figure(figsize=(10, 6))
-    plt.plot(history.history['loss'], label='Train Loss')
-    plt.plot(history.history['val_loss'], label='Val Loss')
+    if opt_name == 'adam': optimizer = Adam(learning_rate=lr)
+    elif opt_name == 'rmsprop': optimizer = RMSprop(learning_rate=lr)
+    else: optimizer = SGD(learning_rate=lr, momentum=0.9)
     
-    # Zaznaczamy najlepszy punkt
-    best_epoch = np.argmin(history.history['val_loss'])
-    best_loss = history.history['val_loss'][best_epoch]
-    plt.scatter(best_epoch, best_loss, c='red', s=50, label=f'Best Epoch ({best_epoch})')
+    model.compile(optimizer=optimizer, loss='mean_squared_error')
+    return model
 
-    plt.title(f'Krzywa uczenia (Min Val Loss: {best_loss:.6f})')
-    plt.xlabel('Epoka')
-    plt.ylabel('MSE')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.savefig(LOSS_PLOT_PATH)
-    print(f"Zapisano wykres: {LOSS_PLOT_PATH}")
+# --- EXECUTION ---
+if __name__ == "__main__":
+    try:
+        # 1. Wczytanie konfiguracji
+        print(f"Loading config: {PARAMS_PATH}")
+        with open(PARAMS_PATH, 'r') as f:
+            config = json.load(f)
+        
+        scaler_X = joblib.load(SCALER_X_PATH)
+        scaler_y = joblib.load(SCALER_Y_PATH)
+        
+        SEQ_LEN = config['optimal_structure']['seq_len']
+        BATCH_SIZE = config['optimal_structure']['batch_size']
+        SPLIT_DATE = config['meta']['split_date']
+        TARGET_COL = config['meta']['target_col']
 
-except Exception as e:
-    print(f"Błąd krytyczny: {e}")
+        # 2. Dane
+        df = pd.read_csv(DATA_PATH, sep=';', decimal=',', index_col=0)
+        df.index = pd.to_datetime(df.index)
+        df = df.sort_index().dropna()
+        
+        feature_cols = [c for c in df.columns if c != TARGET_COL]
+        
+        # Filtracja tylko zbioru treningowego
+        mask_train = df.index < SPLIT_DATE
+        df_train = df.loc[mask_train]
+        
+        # Transformacja
+        X_train_scaled = scaler_X.transform(df_train[feature_cols])
+        y_train_scaled = scaler_y.transform(df_train[[TARGET_COL]])
+        
+        X_train, y_train = create_sequences(X_train_scaled, y_train_scaled, SEQ_LEN)
+        print(f"Training set shape: {X_train.shape}")
+
+        # 3. Trening
+        model = build_model_from_config(config, n_features=len(feature_cols))
+        
+        callbacks = [
+            EarlyStopping(monitor='loss', patience=15, restore_best_weights=True),
+            ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True, monitor='loss')
+        ]
+        
+        print("Starting training...")
+        history = model.fit(
+            X_train, y_train,
+            epochs=150,
+            batch_size=BATCH_SIZE,
+            callbacks=callbacks,
+            verbose=1
+        )
+        
+        print(f"Model saved to: {MODEL_SAVE_PATH}")
+
+    except Exception as e:
+        print(f"Critical Error: {e}")
+        import traceback
+        traceback.print_exc()
