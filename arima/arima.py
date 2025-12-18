@@ -3,7 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import pmdarima as pm
+import time
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+
+# Pomiar czasu - start
+start_time = time.time()
 
 # Konfiguracja ścieżek
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -96,16 +100,21 @@ try:
     rmse = np.sqrt(mean_squared_error(test[target_col], forecast_series))
     mape = np.mean(np.abs((test[target_col] - forecast_series) / test[target_col])) * 100
 
+    # Pomiar czasu - koniec
+    end_time = time.time()
+    execution_time = end_time - start_time
+
     print(f"\nWyniki modelu ARIMA {ORDER}:")
     print(f"MAE: {mae:.2f}")
     print(f"RMSE: {rmse:.2f}")
     print(f"MAPE: {mape:.4f}%")
-    print(f"Direction Accuracy: {dir_acc:.2f}%") # Wyświetlenie w konsoli
+    print(f"Direction Accuracy: {dir_acc:.2f}%")
+    print(f"Czas wykonania: {execution_time:.4f} s")
 
-    # Zapis metryk do pliku CSV (dodano Direction_Accuracy)
+    # Zapis metryk do pliku CSV
     metrics_df = pd.DataFrame({
-        'Metric': ['MAE', 'RMSE', 'MAPE', 'Direction_Accuracy_Pct'],
-        'Value': [mae, rmse, mape, dir_acc]
+        'Metric': ['MAE', 'RMSE', 'MAPE', 'Direction_Accuracy_Pct', 'Execution_Time_Sec'],
+        'Value': [mae, rmse, mape, dir_acc, execution_time]
     })
     metrics_df.to_csv(OUTPUT_METRICS_PATH, sep=';', decimal=',', index=False)
     print(f"Zapisano metryki do: {OUTPUT_METRICS_PATH}")

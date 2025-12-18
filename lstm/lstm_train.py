@@ -4,22 +4,27 @@ import matplotlib.pyplot as plt
 import os
 import json
 import joblib
+import time
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
 from tensorflow.keras.optimizers import Adam, RMSprop, SGD
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
+# Pomiar czasu - start
+start_time = time.time()
+
 # Ścieżki
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.join(SCRIPT_DIR, 'lstm_output')
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, 'lstm_output')
 DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_ret.csv')
 
-PARAMS_PATH = os.path.join(ROOT_DIR, 'lstm_best_params.json')
-FEATURES_PATH = os.path.join(ROOT_DIR, 'lstm_selected_features.json')
-SCALER_X_PATH = os.path.join(ROOT_DIR, 'scaler_x.pkl')
-SCALER_Y_PATH = os.path.join(ROOT_DIR, 'scaler_y.pkl')
-MODEL_PATH = os.path.join(ROOT_DIR, 'training_results', 'best_lstm_model.keras')
-PLOT_PATH = os.path.join(ROOT_DIR, 'training_results', 'learning_curve.png')
+PARAMS_PATH = os.path.join(OUTPUT_DIR, 'lstm_best_params.json')
+FEATURES_PATH = os.path.join(OUTPUT_DIR, 'lstm_selected_features.json')
+SCALER_X_PATH = os.path.join(OUTPUT_DIR, 'scaler_x.pkl')
+SCALER_Y_PATH = os.path.join(OUTPUT_DIR, 'scaler_y.pkl')
+MODEL_PATH = os.path.join(OUTPUT_DIR, 'training_results', 'best_lstm_model.keras')
+PLOT_PATH = os.path.join(OUTPUT_DIR, 'training_results', 'learning_curve.png')
+TIME_PATH = os.path.join(OUTPUT_DIR, 'training_time.json')
 
 os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
 
@@ -109,6 +114,14 @@ if __name__ == "__main__":
         verbose=1
     )
     
+    # Pomiar czasu - koniec
+    end_time = time.time()
+    train_time = end_time - start_time
+    
+    # Zapis czasu treningu do pliku tymczasowego
+    with open(TIME_PATH, 'w') as f:
+        json.dump({'train_time_sec': train_time}, f)
+
     # Wykres
     plt.figure(figsize=(10,5))
     plt.plot(history.history['loss'], label='Train Loss')
@@ -118,3 +131,4 @@ if __name__ == "__main__":
     plt.grid(True, alpha=0.3)
     plt.savefig(PLOT_PATH)
     print(f"Zakończono. Model: {MODEL_PATH}")
+    print(f"Czas treningu: {train_time:.2f} s")

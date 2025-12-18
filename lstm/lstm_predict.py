@@ -4,20 +4,25 @@ import matplotlib.pyplot as plt
 import os
 import json
 import joblib
+import time
 from tensorflow.keras.models import load_model
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
+# Pomiar czasu predykcji - start
+start_time_pred = time.time()
+
 # Ścieżki
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.join(SCRIPT_DIR, 'lstm_output')
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, 'lstm_output')
 DATA_PATH = os.path.join(SCRIPT_DIR, 'dataset_ret.csv')
 
-PARAMS_PATH = os.path.join(ROOT_DIR, 'lstm_best_params.json')
-FEATURES_PATH = os.path.join(ROOT_DIR, 'lstm_selected_features.json')
-MODEL_PATH = os.path.join(ROOT_DIR, 'training_results', 'best_lstm_model.keras')
-SCALER_X_PATH = os.path.join(ROOT_DIR, 'scaler_x.pkl')
-SCALER_Y_PATH = os.path.join(ROOT_DIR, 'scaler_y.pkl')
-PRED_DIR = os.path.join(ROOT_DIR, 'prediction_results')
+PARAMS_PATH = os.path.join(OUTPUT_DIR, 'lstm_best_params.json')
+FEATURES_PATH = os.path.join(OUTPUT_DIR, 'lstm_selected_features.json')
+MODEL_PATH = os.path.join(OUTPUT_DIR, 'training_results', 'best_lstm_model.keras')
+SCALER_X_PATH = os.path.join(OUTPUT_DIR, 'scaler_x.pkl')
+SCALER_Y_PATH = os.path.join(OUTPUT_DIR, 'scaler_y.pkl')
+TIME_PATH = os.path.join(OUTPUT_DIR, 'training_time.json')
+PRED_DIR = os.path.join(OUTPUT_DIR, 'prediction_results')
 os.makedirs(PRED_DIR, exist_ok=True)
 
 # Pliki wynikowe
@@ -95,17 +100,32 @@ if __name__ == "__main__":
     rmse = np.sqrt(mean_squared_error(actual_prices, pred_prices))
     mape = np.mean(np.abs((actual_prices - pred_prices) / actual_prices)) * 100
     dir_acc = np.mean(np.sign(pred_ret) == np.sign(act_ret)) * 100
+
+    # Pomiar czasu - koniec predykcji
+    end_time_pred = time.time()
+    pred_time = end_time_pred - start_time_pred
+
+    # Pobranie czasu treningu
+    try:
+        with open(TIME_PATH) as f:
+            train_time = json.load(f)['train_time_sec']
+    except FileNotFoundError:
+        print("UWAGA: Nie znaleziono pliku z czasem treningu. Przyjęto 0.")
+        train_time = 0
+        
+    total_time = train_time + pred_time
     
     print(f"\n--- WYNIKI MODELU LSTM ---")
     print(f"MAE:  {mae:.2f}")
     print(f"RMSE: {rmse:.2f}")
     print(f"MAPE: {mape:.4f} %")
     print(f"Dir Accuracy: {dir_acc:.2f} %")
+    print(f"Całkowity czas (Train + Predict): {total_time:.4f} s")
     
     # 6. Zapis Metryk do CSV
     metrics_df = pd.DataFrame({
-        'Metric': ['MAE', 'RMSE', 'MAPE', 'Direction_Accuracy_Pct'],
-        'Value': [mae, rmse, mape, dir_acc]
+        'Metric': ['MAE', 'RMSE', 'MAPE', 'Direction_Accuracy_Pct', 'Execution_Time_Sec'],
+        'Value': [mae, rmse, mape, dir_acc, total_time]
     })
     metrics_df.to_csv(OUTPUT_METRICS_PATH, sep=';', decimal=',', index=False)
     print(f"Zapisano metryki: {OUTPUT_METRICS_PATH}")

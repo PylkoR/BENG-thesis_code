@@ -3,9 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import joblib
+import time
 from sklearn.tree import DecisionTreeRegressor, plot_tree
 from sklearn.model_selection import TimeSeriesSplit, RandomizedSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+
+# Pomiar czasu - start
+start_time = time.time()
 
 # Definicja ścieżek systemowych
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -162,15 +166,20 @@ try:
     direction_match = np.sign(pred_returns) == np.sign(actual_returns)
     dir_acc = np.mean(direction_match) * 100
 
+    # Pomiar czasu - koniec
+    end_time = time.time()
+    execution_time = end_time - start_time
+
     print(f"\n--- WYNIKI MODELU CART (Selekcja Cech) ---")
     print(f"MAE:  {mae:.2f}")
     print(f"RMSE: {rmse:.2f}")
     print(f"MAPE: {mape:.4f} %")
     print(f"Dir Accuracy: {dir_acc:.2f} %")
+    print(f"Czas wykonania: {execution_time:.4f} s")
 
     metrics_df = pd.DataFrame({
-        'Metric': ['MAE', 'RMSE', 'MAPE', 'Direction_Accuracy_Pct'],
-        'Value': [mae, rmse, mape, dir_acc]
+        'Metric': ['MAE', 'RMSE', 'MAPE', 'Direction_Accuracy_Pct', 'Execution_Time_Sec'],
+        'Value': [mae, rmse, mape, dir_acc, execution_time]
     })
     metrics_df.to_csv(OUTPUT_METRICS_PATH, sep=';', decimal=',', index=False)
 

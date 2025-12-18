@@ -6,16 +6,21 @@
     "structure": {
         "seq_len": 60,
         "batch_size": 32,
-        "learning_rate": 0.0016289544835511227,
+        "learning_rate": 0.0013066377367869325,
         "optimizer": "rmsprop",
-        "use_dense": true,
-        "dense_units": 16,
+        "use_dense": false,
+        "dense_units": 0,
         "dense_activation": "relu"
     },
     "layers_config": [
         {
-            "units": 96,
+            "units": 160,
             "dropout": 0.4,
+            "return_sequences": true
+        },
+        {
+            "units": 64,
+            "dropout": 0.2,
             "return_sequences": false
         }
     ]
