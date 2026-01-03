@@ -50,6 +50,10 @@ try:
     SELECTED_FEATURES = [
         'SPX_Ret_Lag_1',
         'mWIG40_Ret_Lag_1',
+        'mWIG40_Low_Ret_Lag_7',
+        'mWIG40_Low_Ret_Lag_8',
+        'mWIG40_High_Ret_Lag_3',
+        'mWIG40_Open_Ret_Lag_3',
         'EURPLN_Ret_Lag_1',
         'WIG20_Ret_Lag_1',
         'Bollinger_PB_Lag_1',
@@ -58,6 +62,7 @@ try:
         'USDPLN_Ret_Lag_1',
         'MACD_Hist_Lag_1',
         'NKX_Ret_Lag_2',
+        'WIG20_Ret_Lag_2',
         'Brent_Ret_Lag_3',
         'vix_Zamkniecie_Lag_3',
         'mWIG40_Ret_Lag_2',
@@ -110,7 +115,7 @@ try:
     
     param_dist = {
         'criterion': ['squared_error', 'friedman_mse', 'absolute_error'],
-        'max_depth': [3, 4, 5, 8, 10, 15, 20, None],
+        'max_depth': [6, 8, 10, 15, 20, None],
         'min_samples_split': [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
         'min_samples_leaf': [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
         'max_features': [None, 'sqrt', 'log2'],

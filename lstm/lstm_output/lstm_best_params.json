@@ -4,23 +4,28 @@
         "split": "2022-01-03"
     },
     "structure": {
-        "seq_len": 60,
+        "seq_len": 14,
         "batch_size": 32,
-        "learning_rate": 0.0013066377367869325,
-        "optimizer": "rmsprop",
+        "learning_rate": 0.008519245752641869,
+        "optimizer": "adam",
         "use_dense": false,
         "dense_units": 0,
         "dense_activation": "relu"
     },
     "layers_config": [
         {
-            "units": 160,
+            "units": 64,
+            "dropout": 0.0,
+            "return_sequences": true
+        },
+        {
+            "units": 256,
             "dropout": 0.4,
             "return_sequences": true
         },
         {
-            "units": 64,
-            "dropout": 0.2,
+            "units": 96,
+            "dropout": 0.30000000000000004,
             "return_sequences": false
         }
     ]

@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import sys
 import os
 
@@ -19,16 +20,18 @@ try:
     plt.figure(figsize=(12, 6), dpi=200)
     plt.plot(df['Data'], df['Otwarcie'], label='Cena otwarcia')
 
-    plt.title('Wykres kursu otwarcia (mWIG40)', fontsize = TITLE_FONT_SIZE)
-    plt.xlabel('Data', fontsize = AXIS_FONT_SIZE)
-    plt.ylabel('Wartość kursu otwarcia', fontsize = AXIS_FONT_SIZE)
-    plt.xticks(fontsize = TICK_FONT_SIZE)
-    plt.yticks(fontsize = TICK_FONT_SIZE)
+    plt.title('Wykres kursu otwarcia mWIG40', fontsize=TITLE_FONT_SIZE)
+    plt.xlabel('Data', fontsize=AXIS_FONT_SIZE)
+    plt.ylabel('Kurs otwarcia', fontsize=AXIS_FONT_SIZE)
+    plt.xticks(fontsize=TICK_FONT_SIZE)
+    plt.yticks(fontsize=TICK_FONT_SIZE)
 
     plt.grid(True)
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(mticker.StrMethodFormatter('{x:.0f} pkt'))
+
     plt.tight_layout()
     plt.savefig(OUTPUT_FILE, dpi=200)
-    plt.show()
 
 except FileNotFoundError:
     print(f"BŁĄD: Nie znaleziono pliku pod ścieżką: {DATA_PATH}")

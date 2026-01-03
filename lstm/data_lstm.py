@@ -38,7 +38,7 @@ try:
     # 2. Inżynieria Cech
     print("Obliczanie wskaźników...")
     
-    # Logarytmiczne zwroty dla rynków zewnętrznych
+    # A. Logarytmiczne zwroty dla rynków zewnętrznych
     external_assets = {
         'dax_Zamkniecie': 'DAX_Ret',
         'spx_Zamkniecie': 'SPX_Ret',
@@ -53,12 +53,22 @@ try:
         if col in df.columns:
             df[new_name] = np.log(df[col] / df[col].shift(1))
 
-    # Wskaźniki dla celu (mWIG40)
+    # B. Logarytmiczne zwroty dla mWIG40 (OHLC)
+    # Zwroty dla wszystkich cen
+    mwig_ohlc = {
+        'mwig40_Otwarcie': 'mWIG40_Open_Ret',
+        'mwig40_Najwyzszy': 'mWIG40_High_Ret',
+        'mwig40_Najnizszy': 'mWIG40_Low_Ret',
+        'mwig40_Zamkniecie': 'mWIG40_Ret'
+    }
+
+    for col, new_name in mwig_ohlc.items():
+        if col in df.columns:
+            df[new_name] = np.log(df[col] / df[col].shift(1))
+
+    # C. Wskaźniki techniczne dla celu (mWIG40_Zamkniecie)
     target_col = 'mwig40_Zamkniecie'
     
-    # Log Return samego mWIG40
-    df['mWIG40_Ret'] = np.log(df[target_col] / df[target_col].shift(1))
-
     # RSI (Momentum)
     df['RSI_14'] = calculate_rsi(df[target_col], window=14)
 
@@ -77,11 +87,15 @@ try:
 
     # 3. Selekcja i czyszczenie
     features_to_keep = [
-        'mwig40_Zamkniecie',
-        'mwig40_Wolumen',       
-        'mWIG40_Ret',           
+        'mwig40_Zamkniecie',    # Wartość bezwzględna (jako punkt odniesienia)
+        'mwig40_Wolumen',       # Wolumen handlu
+        'mWIG40_Ret',           # Zwrot zamknięcia
+        'mWIG40_Open_Ret',      # NOWE: Zwrot otwarcia
+        'mWIG40_High_Ret',      # NOWE: Zwrot najwyższej ceny
+        'mWIG40_Low_Ret',       # NOWE: Zwrot najniższej ceny
         'RSI_14', 'Bollinger_PB', 'MACD_Hist', 'Volatility_20', 
-        'DAX_Ret', 'SPX_Ret', 'spx_Wolumen', 'NKX_Ret', 'Brent_Ret', 'EURPLN_Ret', 'USDPLN_Ret', 'WIG20_Ret',
+        'DAX_Ret', 'SPX_Ret', 'spx_Wolumen', 'NKX_Ret', 'Brent_Ret', 
+        'EURPLN_Ret', 'USDPLN_Ret', 'WIG20_Ret',
         'pmi_PMI',
         'vix_Zamkniecie'        
     ]
@@ -90,7 +104,7 @@ try:
     available_features = [f for f in features_to_keep if f in df.columns]
     df_processed = df[available_features].copy()
 
-    # Usuwanie NaN powstałe przy liczeniu wskaźników
+    # Usuwanie NaN powstałych przy liczeniu wskaźników i shiftów
     initial_len = len(df_processed)
     df_processed = df_processed.dropna()
     print(f"Usunięto {initial_len - len(df_processed)} wierszy (rozruch wskaźników)")
@@ -98,8 +112,9 @@ try:
     # 4. Zapis
     df_processed.to_csv(OUTPUT_DATA_PATH, sep=';', decimal=',')
     df_processed.to_csv(OUTPUT_DATA_PATH_ROOT, sep=';', decimal=',')
-    print(f"Zapisano przetworzone dane do: {OUTPUT_DATA_PATH}")
-    print(f"Zapisano przetworzone dane do: {OUTPUT_DATA_PATH_ROOT}")
+    
+    print(f"Zapisano przetworzone dane. Liczba cech: {len(df_processed.columns)}")
+    print(f"Nowy zakres dat: {df_processed.index.min()} - {df_processed.index.max()}")
 
 except Exception as e:
     print(f"Wystąpił błąd krytyczny: {e}")

@@ -29,22 +29,30 @@ SPLIT_DATE = '2022-01-03'
 MAX_EPOCHS = 30
 VAL_SPLIT = 0.2
 
-SEQ_LEN = 60     
+SEQ_LEN = 14     
 BATCH_SIZE = 32    
 
 # Wybrane cechy
 MY_FEATURES = [
+    #'mwig40_Zamkniecie',
+    'mwig40_Wolumen',
     'mWIG40_Ret', 
+    'mWIG40_Open_Ret',
+    'mWIG40_High_Ret',
+    #'mWIG40_Low_Ret',
     'RSI_14', 
     'Bollinger_PB',
     #'MACD_Hist',
     'Volatility_20',
     'SPX_Ret',
+    #'spx_Wolumen',
     #'DAX_Ret',
     #'WIG20_Ret',
     'NKX_Ret',
     #'Brent_Ret',
     'EURPLN_Ret',
+    #'USDPLN_Ret',
+    #'pmi_PMI',
     #'vix_Zamkniecie'
 ]
 

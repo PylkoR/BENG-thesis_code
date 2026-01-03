@@ -1,5 +1,8 @@
 [
+    "mwig40_Wolumen",
     "mWIG40_Ret",
+    "mWIG40_Open_Ret",
+    "mWIG40_High_Ret",
     "RSI_14",
     "Bollinger_PB",
     "Volatility_20",
