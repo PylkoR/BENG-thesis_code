@@ -49,6 +49,10 @@ try:
     SELECTED_FEATURES = [
         'SPX_Ret_Lag_1',
         'mWIG40_Ret_Lag_1',
+        'mWIG40_Low_Ret_Lag_7',
+        'mWIG40_Low_Ret_Lag_8',
+        'mWIG40_High_Ret_Lag_3',
+        'mWIG40_Open_Ret_Lag_3',
         'EURPLN_Ret_Lag_1',
         'WIG20_Ret_Lag_1',
         'Bollinger_PB_Lag_1',
@@ -57,6 +61,7 @@ try:
         'USDPLN_Ret_Lag_1',
         'MACD_Hist_Lag_1',
         'NKX_Ret_Lag_2',
+        'WIG20_Ret_Lag_2',
         'Brent_Ret_Lag_3',
         'vix_Zamkniecie_Lag_3',
         'mWIG40_Ret_Lag_2',
