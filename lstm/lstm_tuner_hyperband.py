@@ -4,11 +4,14 @@ import os
 import json
 import joblib
 import keras_tuner as kt
+import time
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
 from tensorflow.keras.optimizers import Adam, RMSprop, SGD
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import MinMaxScaler
+
+start_tuning = time.time()
 
 # Ścieżki
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -29,31 +32,31 @@ SPLIT_DATE = '2022-01-03'
 MAX_EPOCHS = 30
 VAL_SPLIT = 0.2
 
-SEQ_LEN = 14     
+SEQ_LEN = 14
 BATCH_SIZE = 32    
 
 # Wybrane cechy
 MY_FEATURES = [
     #'mwig40_Zamkniecie',
-    'mwig40_Wolumen',
-    'mWIG40_Ret', 
+    #'mwig40_Wolumen',
+    #'mWIG40_Ret', 
     'mWIG40_Open_Ret',
-    'mWIG40_High_Ret',
+    #'mWIG40_High_Ret',
     #'mWIG40_Low_Ret',
     'RSI_14', 
     'Bollinger_PB',
-    #'MACD_Hist',
-    'Volatility_20',
+    'MACD_Hist',
+    #'Volatility_20',
     'SPX_Ret',
     #'spx_Wolumen',
     #'DAX_Ret',
     #'WIG20_Ret',
-    'NKX_Ret',
+    #'NKX_Ret',
     #'Brent_Ret',
     'EURPLN_Ret',
     #'USDPLN_Ret',
     #'pmi_PMI',
-    #'vix_Zamkniecie'
+    'vix_Zamkniecie'
 ]
 
 n_features_global = len(MY_FEATURES)
@@ -148,8 +151,20 @@ if __name__ == "__main__":
         validation_split=VAL_SPLIT, 
         callbacks=[stop_early], 
         verbose=1,
-        batch_size=BATCH_SIZE
+        batch_size=BATCH_SIZE,
+        shuffle=False
     )
+
+    # Pomiar czasu po zakończeniu search:
+    end_tuning = time.time()
+    tuning_time = end_tuning - start_tuning
+
+    # Zapis czasu tuningu do nowego pliku JSON w folderze wyjściowym:
+    TUNING_TIME_PATH = os.path.join(OUTPUT_DIR, 'tuning_time.json')
+    with open(TUNING_TIME_PATH, 'w') as f:
+        json.dump({'tuning_time_sec': tuning_time}, f)
+
+    print(f"Czas tuningu Hyperband: {tuning_time:.2f} s")
     
     # 5. Zapis wyników (Eksport konfiguracji)
     best_hps = tuner.get_best_hyperparameters()[0]

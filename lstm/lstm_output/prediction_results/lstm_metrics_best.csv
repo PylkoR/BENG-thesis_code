@@ -1,0 +1,39 @@
+Metric;Value
+MAE;45,37447529416544
+RMSE;63,24757744950796
+MAPE;0,8831979286673874
+Direction_Accuracy_Pct;57,108140947752126
+Execution_Time_Sec;664,4225513935089
+
+{
+    "meta": {
+        "target": "mWIG40_Ret",
+        "split": "2022-01-03"
+    },
+    "structure": {
+        "seq_len": 14,
+        "batch_size": 32,
+        "learning_rate": 0.0054986817452001,
+        "optimizer": "rmsprop",
+        "use_dense": false,
+        "dense_units": 0,
+        "dense_activation": "relu"
+    },
+    "layers_config": [
+        {
+            "units": 32,
+            "dropout": 0.2,
+            "return_sequences": true
+        },
+        {
+            "units": 256,
+            "dropout": 0.1,
+            "return_sequences": true
+        },
+        {
+            "units": 224,
+            "dropout": 0.2,
+            "return_sequences": false
+        }
+    ]
+}

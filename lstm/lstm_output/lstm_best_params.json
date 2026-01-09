@@ -6,26 +6,26 @@
     "structure": {
         "seq_len": 14,
         "batch_size": 32,
-        "learning_rate": 0.008519245752641869,
-        "optimizer": "adam",
+        "learning_rate": 0.0054986817452001,
+        "optimizer": "rmsprop",
         "use_dense": false,
         "dense_units": 0,
         "dense_activation": "relu"
     },
     "layers_config": [
         {
-            "units": 64,
-            "dropout": 0.0,
+            "units": 32,
+            "dropout": 0.2,
             "return_sequences": true
         },
         {
             "units": 256,
-            "dropout": 0.4,
+            "dropout": 0.1,
             "return_sequences": true
         },
         {
-            "units": 96,
-            "dropout": 0.30000000000000004,
+            "units": 224,
+            "dropout": 0.2,
             "return_sequences": false
         }
     ]

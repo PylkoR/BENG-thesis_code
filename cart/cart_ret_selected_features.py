@@ -114,12 +114,11 @@ try:
     tscv = TimeSeriesSplit(n_splits=4)
     
     param_dist = {
-        'criterion': ['squared_error', 'friedman_mse', 'absolute_error'],
-        'max_depth': [6, 8, 10, 15, 20, None],
-        'min_samples_split': [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        'min_samples_leaf': [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        'criterion': ['squared_error', 'absolute_error'],
+        'max_depth': [4, 5, 6, 7, 8, 9, 10, None],
+        'min_samples_split': [20, 30, 40, 50, 60, 70, 80, 90, 100],
+        'min_samples_leaf': [20, 30, 40, 50, 60, 70, 80, 90, 100],
         'max_features': [None, 'sqrt', 'log2'],
-        'ccp_alpha': [0.0, 0.001, 0.005, 0.01]
     }
 
     dt = DecisionTreeRegressor(random_state=42)
@@ -227,7 +226,7 @@ try:
 
     # Wizualizacja struktury drzewa (max_depth=4 dla czytelności)
     plt.figure(figsize=(20, 10))
-    plot_tree(model, max_depth=4, feature_names=available_features, filled=True, fontsize=10, rounded=True)
+    plot_tree(model, max_depth=5, feature_names=available_features, filled=True, fontsize=10, rounded=True, impurity=False)
     plt.title(f"Struktura Drzewa CART (Top Features)", fontsize=TITLE_FONT_SIZE)
     plt.savefig(OUTPUT_PLOT_TREE, dpi=200)
 

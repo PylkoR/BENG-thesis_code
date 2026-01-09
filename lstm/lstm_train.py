@@ -111,7 +111,8 @@ if __name__ == "__main__":
         batch_size=BATCH_SIZE, # Używamy BATCH_SIZE z JSON
         validation_split=0.2,
         callbacks=callbacks,
-        verbose=1
+        verbose=1,
+        shuffle=False
     )
     
     # Pomiar czasu - koniec

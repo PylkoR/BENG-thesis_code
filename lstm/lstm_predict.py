@@ -22,6 +22,7 @@ MODEL_PATH = os.path.join(OUTPUT_DIR, 'training_results', 'best_lstm_model.keras
 SCALER_X_PATH = os.path.join(OUTPUT_DIR, 'scaler_x.pkl')
 SCALER_Y_PATH = os.path.join(OUTPUT_DIR, 'scaler_y.pkl')
 TIME_PATH = os.path.join(OUTPUT_DIR, 'training_time.json')
+TUNING_TIME_PATH = os.path.join(OUTPUT_DIR, 'tuning_time.json')
 PRED_DIR = os.path.join(OUTPUT_DIR, 'prediction_results')
 os.makedirs(PRED_DIR, exist_ok=True)
 
@@ -105,22 +106,31 @@ if __name__ == "__main__":
     end_time_pred = time.time()
     pred_time = end_time_pred - start_time_pred
 
-    # Pobranie czasu treningu
     try:
         with open(TIME_PATH) as f:
             train_time = json.load(f)['train_time_sec']
     except FileNotFoundError:
-        print("UWAGA: Nie znaleziono pliku z czasem treningu. Przyjęto 0.")
         train_time = 0
-        
-    total_time = train_time + pred_time
+
+    try:
+        with open(TUNING_TIME_PATH) as f:
+            tuning_time = json.load(f)['tuning_time_sec']
+    except FileNotFoundError:
+        tuning_time = 0
+            
+    # Suma wszystkich etapów
+    total_time = tuning_time + train_time + pred_time
+
+    print(f"Czas tuningu:  {tuning_time:.2f} s")
+    print(f"Czas treningu: {train_time:.2f} s")
+    print(f"Czas predykcji: {pred_time:.2f} s")
     
     print(f"\n--- WYNIKI MODELU LSTM ---")
     print(f"MAE:  {mae:.2f}")
     print(f"RMSE: {rmse:.2f}")
     print(f"MAPE: {mape:.4f} %")
     print(f"Dir Accuracy: {dir_acc:.2f} %")
-    print(f"Całkowity czas (Train + Predict): {total_time:.4f} s")
+    print(f"Całkowity czas (Tuning + Train + Predict): {total_time:.4f} s")
     
     # 6. Zapis Metryk do CSV
     metrics_df = pd.DataFrame({

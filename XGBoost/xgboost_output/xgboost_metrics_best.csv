@@ -1,6 +1,8 @@
 Metric;Value
-MAE;45,24474691546991
-RMSE;62,725548801628236
-MAPE;0,8800052344935367
-Direction_Accuracy_Pct;57,4726609963548
-Execution_Time_Sec;23,898387670516968
+MAE;45,16840130431829
+RMSE;62,649993392438525
+MAPE;0,8783410433940643
+Direction_Accuracy_Pct;57,837181044957475
+Execution_Time_Sec;109,91568183898926
+
+Wybrane parametry optymalne: {'subsample': 0.6, 'reg_lambda': 1.5, 'reg_alpha': 0, 'n_estimators': 200, 'min_child_weight': 10, 'max_depth': 3, 'learning_rate': 0.01, 'colsample_bytree': 1.0}

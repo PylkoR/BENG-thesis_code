@@ -6,11 +6,12 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Słownik ścieżek zbudowany na podstawie Twoich skryptów
 METRICS_FILES = {
-    'LSTM': os.path.join(SCRIPT_DIR, 'lstm', 'lstm_output', 'prediction_results', 'lstm_metrics.csv'),
     'CART': os.path.join(SCRIPT_DIR, 'cart', 'cart_ret_output_selected_features', 'cart_metrics.csv'),
     'XGBoost': os.path.join(SCRIPT_DIR, 'XGBoost', 'xgboost_output', 'xgboost_metrics.csv'),
+    'LSTM': os.path.join(SCRIPT_DIR, 'lstm', 'lstm_output', 'prediction_results', 'lstm_metrics.csv'),
+    'ARIMA': os.path.join(SCRIPT_DIR, 'arima', 'arima_metrics.csv'),
     'Naive': os.path.join(SCRIPT_DIR, 'naive', 'naive_metrics.csv'),
-    'ARIMA': os.path.join(SCRIPT_DIR, 'arima', 'arima_metrics.csv')
+    'Naive trend': os.path.join(SCRIPT_DIR, 'naive', 'naive_d_metrics.csv')
 }
 
 def combine_metrics():

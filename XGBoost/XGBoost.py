@@ -106,13 +106,12 @@ try:
     
     # Siatka parametrów dla XGBoost
     param_dist = {
-        'n_estimators': [500, 800, 1000, 1200, 1400, 1600, 1800, 2000],
+        'n_estimators': [50, 100, 200, 500, 800, 1000, 1200, 1400, 1600],
         'learning_rate': [0.001, 0.005, 0.01, 0.015, 0.02],
-        'max_depth': [4, 5, 6, 7, 8],
+        'max_depth': [3, 4, 5, 6, 7, 8],
         'min_child_weight': [5, 10, 20, 30],
         'subsample': [0.6, 0.7, 0.8, 0.9, 1.0],
         'colsample_bytree': [0.6, 0.7, 0.8, 0.9, 1.0],
-        'gamma': [0, 0.1, 0.2, 0.5],
         'reg_alpha': [0, 0.01, 0.1, 1],
         'reg_lambda': [0.5, 1, 1.5, 2]
     }
@@ -126,7 +125,7 @@ try:
     random_search = RandomizedSearchCV(
         xgb_model, 
         param_distributions=param_dist, 
-        n_iter=200,  # Liczba iteracji
+        n_iter=300,  # Liczba iteracji
         cv=tscv, 
         scoring='neg_mean_squared_error', 
         n_jobs=-1,
