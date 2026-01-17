@@ -40,7 +40,6 @@ try:
     # Prognoza(t) = Cena(t) + (Cena(t) - Cena(t-1))
     df['Diff'] = df[target_col].diff()
     df['Naive_Forecast'] = df[target_col].shift(1) + df['Diff'].shift(1)
-    # Usuwamy pierwszy wiersz (NaN po przesunięciu)
     df = df.dropna()
 
     data = df[[target_col, 'Naive_Forecast']].copy()
@@ -74,9 +73,9 @@ try:
     else:
         results_df.loc[results_df.index[0], 'Prev_Forecast'] = last_train_val
 
-    results_df['Prognozowany_Zwrot'] = results_df['Naive_Forecast'] - results_df['Prev_Actual']
+    results_df['Prognoza_Zwrot'] = results_df['Naive_Forecast'] - results_df['Prev_Actual']
 
-    direction_match = np.sign(results_df['Rzeczywisty_Zwrot']) == np.sign(results_df['Prognozowany_Zwrot'])
+    direction_match = np.sign(results_df['Rzeczywisty_Zwrot']) == np.sign(results_df['Prognoza_Zwrot'])
     dir_acc = np.mean(direction_match) * 100
 
     # 5. Obliczenie metryk błędu

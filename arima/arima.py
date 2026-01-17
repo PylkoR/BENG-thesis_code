@@ -27,7 +27,7 @@ TICK_FONT_SIZE = 12
 
 # Data podziału na treningowy i testowy
 SPLIT_DATE = '2022-01-03'
-ORDER = (3, 1, 1)
+ORDER = (3, 1, 0)
 
 try:
     # 1. Wczytanie i przygotowanie danych

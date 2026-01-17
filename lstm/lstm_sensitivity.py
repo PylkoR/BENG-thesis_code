@@ -21,6 +21,10 @@ SCALER_Y_PATH = os.path.join(ROOT_DIR, 'scaler_y.pkl')
 OUTPUT_PLOT = os.path.join(ROOT_DIR, 'feature_importance.png')
 OUTPUT_CSV = os.path.join(ROOT_DIR, 'feature_importance.csv')
 
+TITLE_FONT_SIZE = 18
+AXIS_FONT_SIZE = 14
+TICK_FONT_SIZE = 12
+
 def create_sequences(X, y, seq_len):
     Xs, ys = [], []
     for i in range(len(X) - seq_len):
@@ -31,7 +35,7 @@ def create_sequences(X, y, seq_len):
 if __name__ == "__main__":
     print("--- Globalna analiza wrażliwości ---")
     
-    # 1. Wczytywanie zasobów
+    # 1. Wczytywanie
     with open(PARAMS_PATH) as f: config = json.load(f)
     with open(FEATURES_PATH) as f: features = json.load(f)
     scaler_X = joblib.load(SCALER_X_PATH)
@@ -99,14 +103,22 @@ if __name__ == "__main__":
     
     # Wykres
     plt.figure(figsize=(12, 8))
+
     # Kolory: Niebieski (Ważna), Czerwony (Szkodliwa - zmniejsza błąd po usunięciu)
     colors = ['red' if x <= 0 else 'skyblue' for x in results['Importance_MSE_Drop']]
-    
+
     plt.barh(results['Feature'], results['Importance_MSE_Drop'], color=colors)
     plt.axvline(x=0, color='black', linestyle='--', linewidth=0.8)
-    
-    plt.xlabel('Wzrost błędu MSE po przetasowaniu (Więcej = Ważniejsza cecha)')
-    plt.title(f'Ważność Cech LSTM (Permutation Importance)\nBaseline MSE: {baseline_mse:.2e}')
+
+    # Ustawienie rozmiarów czcionek
+    plt.xlabel('Wzrost błędu MSE po przetasowaniu (Więcej = Ważniejsza cecha)', fontsize=AXIS_FONT_SIZE)
+    plt.ylabel('Cecha', fontsize=AXIS_FONT_SIZE) # Dodano etykietę osi Y
+    plt.title(f'Ważność Cech LSTM (Permutation Importance)\nBaseline MSE: {baseline_mse:.2e}', fontsize=TITLE_FONT_SIZE)
+
+    # Ustawienie rozmiaru czcionek na osiach
+    plt.xticks(fontsize=TICK_FONT_SIZE)
+    plt.yticks(fontsize=TICK_FONT_SIZE)
+
     plt.grid(True, axis='x', alpha=0.3)
     plt.tight_layout()
     plt.savefig(OUTPUT_PLOT)

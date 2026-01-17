@@ -42,6 +42,7 @@ try:
     model = pm.auto_arima(train[target_col], 
                           start_p=0, start_q=0,
                           max_p=5, max_q=5,
+                          max_order=10,
                           d=None,           
                           seasonal=False,   
                           trace=True,
